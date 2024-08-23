@@ -9,6 +9,8 @@ import { authRequired } from './middleware/validateToken.js';
 import { profile } from './controllers/auth.controller.js';
 import productRoutes from './routes/product.routes.js';
 import cartRoutes from './routes/cart.routes.js';
+import ticketRoutes from './routes/ticket.routes.js';
+import checkoutRoutes from './routes/checkout.routes.js';
 
 const app = express();
 
@@ -24,6 +26,7 @@ app.use((err, req, res, next) => {
 });
 app.use('/api', productRoutes);
 app.use('/api', cartRoutes);
-
+app.use('/api', ticketRoutes);
+app.use('/api', checkoutRoutes);
 
 export default app;
