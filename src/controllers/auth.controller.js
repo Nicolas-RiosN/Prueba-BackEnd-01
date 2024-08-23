@@ -5,11 +5,10 @@ import jwt from 'jsonwebtoken';
 import { TOKEN_SECRET } from '../config.js';
 
 export const register = async (req, res) => {
-    const {first_name, last_name, email, age, password, role} = req.body
+    const { first_name, last_name, email, age, password, role } = req.body;
 
     try {
-
-        const passwordHash = await bcryptjs.hash(password, 10)
+        const passwordHash = await bcryptjs.hash(password, 10);
         const newUser = new User({
             first_name,
             last_name,
@@ -17,25 +16,30 @@ export const register = async (req, res) => {
             password: passwordHash,
             age,
             role
-        })
-    
+        });
+
         const userSaved = await newUser.save();
-        
-        const token = await createAccessToken({id:userSaved._id})
-        res.cookie('token', token)
+
+        const token = jwt.sign({ 
+            id: userSaved._id, 
+            role: userSaved.role // Incluye el rol en el token
+        }, TOKEN_SECRET, { expiresIn: '1d' });
+
+        res.cookie('token', token);
         res.json({
             id: userSaved._id,
-            first_name:userSaved.first_name,
-            last_name:userSaved.last_name,
-            email:userSaved.email,
-            age:userSaved.age,
-        })
+            first_name: userSaved.first_name,
+            last_name: userSaved.last_name,
+            email: userSaved.email,
+            age: userSaved.age,
+            role: userSaved.role // Incluye el rol en la respuesta
+        });
 
-        
     } catch (error) {
-        res.status(500).json({message: error.message})
+        res.status(500).json({ message: error.message });
     }
-}; 
+};
+ 
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
@@ -47,7 +51,10 @@ export const login = async (req, res) => {
         const isMatch = await bcryptjs.compare(password, userFound.password);
         if (!isMatch) return res.status(400).json({ message: "Incorrect password" });
 
-        const token = jwt.sign({ id: userFound._id }, TOKEN_SECRET, { expiresIn: '1d' });
+        const token = jwt.sign({ 
+            id: userFound._id, 
+            role: userFound.role // Incluye el rol en el token
+        }, TOKEN_SECRET, { expiresIn: '1d' });
 
         res.cookie('token', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' });
 
@@ -57,6 +64,7 @@ export const login = async (req, res) => {
             last_name: userFound.last_name,
             email: userFound.email,
             age: userFound.age,
+            role: userFound.role // Incluye el rol en la respuesta
         });
 
     } catch (error) {

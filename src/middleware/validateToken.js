@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { TOKEN_SECRET } from "../config.js";
 
 export const authRequired = (req, res, next) => {
-    const token = req.cookies.token; // Lee el token de las cookies
+    const token = req.cookies.token;
 
     if (!token) {
         return res.status(401).json({ message: "No token, authorization denied" });
@@ -13,7 +13,8 @@ export const authRequired = (req, res, next) => {
             return res.status(403).json({ message: "Invalid token" });
         }
 
-        req.user = decoded; // Guarda la información del usuario decodificada en la solicitud
+        req.user = decoded;
+        console.log('Decoded user from authRequired:', decoded); // Verifica el contenido del token
         next();
     });
 };

@@ -7,6 +7,8 @@ import  authRoutes  from './routes/auth.routes.js';
 import router from './routes/auth.routes.js';
 import { authRequired } from './middleware/validateToken.js';
 import { profile } from './controllers/auth.controller.js';
+import productRoutes from './routes/product.routes.js';
+import cartRoutes from './routes/cart.routes.js';
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
+app.use('/api', productRoutes);
+app.use('/api', cartRoutes);
 
 
 export default app;
